@@ -1,4 +1,4 @@
 VU-kaf-parser
 =============
 
-Library to parse kaf
+This is a library to parse kaf files.
