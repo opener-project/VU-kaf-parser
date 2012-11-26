@@ -1,14 +1,27 @@
 
 from lxml import etree
-from KafDataObjectsMod import KafTerm, KafTermSentiment
+from KafDataObjectsMod import *
 import time
 
 class KafParser:
   def __init__(self,filename=None):
     self.tree=None
+    self.__pathForToken={}
     
     if filename:
         self.tree = etree.parse(filename,etree.XMLParser(remove_blank_text=True))
+        ## Do the text tokenization
+        self.__textTokenization()
+        
+  def __textTokenization(self):
+    for wf in self.tree.findall('text/wf'):
+      wid = wf.get('wid')
+      self.__pathForToken[wid] = self.tree.getpath(wf)
+     
+  
+  def getToken(self,tid):
+    path = self.__pathForToken[tid]
+    return self.tree.xpath(self.__pathForToken[tid])[0]
 
   def getTerms(self):
      if self.tree:
@@ -18,16 +31,25 @@ class KafParser:
            kafTermObj.setLemma(element.get('lemma'))
            kafTermObj.setPos(element.get('pos'))
            
-           
+           ## Parsing sentiment
            sentiment = element.find('sentiment')
            if sentiment is not None:
              resource = sentiment.get('resource','')
              polarity = sentiment.get('polarity','')
              strength = sentiment.get('strength','')
              subjectivity = sentiment.get('subjectivity','')
+             sentiment_modifier = sentiment.get('sentiment_modifier')
+             
              my_sent = KafTermSentiment()
-             my_sent.simpleInit(resource,polarity,strength,subjectivity)
+             my_sent.simpleInit(resource,polarity,strength,subjectivity,sentiment_modifier)
              kafTermObj.setSentiment(my_sent)
+          
+           ## Parsing the span
+           span = element.find('span')
+           if span is not None:
+            list_ids = [target.get('id') for target in span.findall('target')]
+            kafTermObj.set_list_span_id(list_ids)
+        
              
            yield kafTermObj
      else:
@@ -107,9 +129,21 @@ class KafParser:
     if layer_element is None:
       layer_element = etree.Element(type)
       self.tree.getroot().append(layer_element)
+      ## The id is going to be the first one
+      new_id = type[0]+'_1'
+    else:
+      ## We need to know how many elements there are in the layer
+      current_n = len(layer_element.getchildren())
+      new_id = type[0]+'_'+str(current_n+1)
+      
       
     ## In this point layer_element points to the correct element, wether existing or created
+    
+    element.set(type[0]+'id',new_id)
     layer_element.append(element)
+    
+  def addElementToLayer(self,layer, element):
+    self.addLayer(layer,element)
     
   
 

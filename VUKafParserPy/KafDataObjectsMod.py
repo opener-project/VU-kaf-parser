@@ -1,17 +1,30 @@
 class KafTermSentiment:
   def __init__(self):
-    self.resource=''
-    self.polarity=''
-    self.strength=''
-    self.subjectivity=''
+    self.resource=None
+    self.polarity=None
+    self.strength=None
+    self.subjectivity=None
     
-  def simpleInit(self,r,p,st,su):
+  def simpleInit(self,r,p,st,su,sm=None):
     self.resource=r
     self.polarity=p
     self.strength=st
     self.subjectivity=su
+    self.sentiment_modifier = sm
+    
+  def getPolarity(self):
+    return self.polarity
+  
+  def getSentimentModifier(self):
+    return self.sentiment_modifier
     
     
+class KafToken:
+  def __init__(self,wid, value, sent=None, para=None):
+    self.token_id = wid
+    self.value = value
+    self.sent = sent
+    self.para = para
   
 
 
@@ -21,6 +34,14 @@ class KafTerm:
     self.lemma = None
     self.pos = None
     self.sentiment = None
+    self.list_span_id = []
+    
+  def set_list_span_id(self, L):
+    self.list_span_id = L
+    
+  def get_list_span(self):
+    return self.list_span_id
+    
     
   def setSentiment(self,my_sent):
     self.sentiment = my_sent
