@@ -23,6 +23,11 @@ class KafParser:
     path = self.__pathForToken[tid]
     return self.tree.xpath(self.__pathForToken[tid])[0]
 
+  
+  def getLanguage(self):
+        lang = self.tree.getroot().get('{http://www.w3.org/XML/1998/namespace}lang','nl')
+        return lang
+    
   def getTerms(self):
      if self.tree:
        for element in self.tree.find('terms'):
@@ -146,9 +151,64 @@ class KafParser:
     self.addLayer(layer,element)
     
   
+  def addAttributeToElement(self,path,str_id, id, attribute, value):
+      for element in self.tree.findall(path):
+        if id is not None and element.get(str_id,None) == id:
+          element.set(attribute,value)
+          return
+    
+  
+  def getSingleProperties(self):
+      for element in self.tree.findall('properties/property'):
+          my_id = element.get('pid')
+          my_type = element.get('type')
+          for span_element in element.findall('span'):
+              target_ids = [target_element.get('id') for target_element in span_element.findall('target')]
+              my_prop = KafSingleProperty(my_id,my_type,target_ids)
+              yield my_prop
 
 
-    
-    
+  
+  def getSingleEntities(self):
+      for element in self.tree.findall('entities/entity'):
+          my_id = element.get('eid')
+          my_type = element.get('type')
+          for span_element in element.findall('span'):
+              target_ids = [target_element.get('id') for target_element in span_element.findall('target')]
+              my_prop = KafSingleEntity(my_id,my_type,target_ids)
+              yield my_prop
+
+
+  def getOpinions(self):
+    for element in self.tree.findall('opinions/opinion'):
+      my_id = element.get('oid')
+      
+      tar_ids_hol = []
+      tar_ids_tar = []
+      polarity = strenght = ''
+      tar_ids_exp = []
+      
+      #Holder
+      opi_hol_eles = element.findall('opinion_holder')
+      if len(opi_hol_eles)!=0:
+          opi_hol_ele = opi_hol_eles[0]
+          tar_ids_hol = [t_ele.get('id') for t_ele in opi_hol_ele.findall('span/target')]
+      
+      #Target
+      opi_tar_eles = element.findall('opinion_target')
+      if len(opi_tar_eles) != 0:
+        opi_tar_ele = opi_tar_eles[0]
+        tar_ids_tar = [t_ele.get('id') for t_ele in opi_tar_ele.findall('span/target')]
+        
+      ## Opinion expression
+      opi_exp_eles = element.findall('opinion_expression')
+      if len(opi_exp_eles) != 0:
+          opi_exp_ele = opi_exp_eles[0]
+          polarity = opi_exp_ele.get('polarity','')
+          strength = opi_exp_ele.get('strength','')
+          tar_ids_exp = [t_ele.get('id') for t_ele in opi_exp_ele.findall('span/target')]
+
+      yield KafOpinion(my_id,tar_ids_hol, tar_ids_tar, KafOpinionExpression(polarity, strength,tar_ids_exp))    
+
     
     

@@ -27,6 +27,49 @@ class KafToken:
     self.para = para
   
 
+class KafOpinionExpression:
+  def __init__(self,polarity,strength,targets):
+    self.polarity = polarity
+    self.strength = strength
+    self.targets = targets
+    
+  def __str__(self):
+    return 'Op_exp==> pol:'+self.polarity+' Str:'+self.strength+' ids:'+'-'.join(self.targets)
+    
+class KafOpinion:
+  def __init__(self,id,holders, targets, opi_exp):
+    self.id = id
+    self.holders = holders
+    self.targets = targets
+    self.opi_exp = opi_exp
+    
+  def __str__(self):
+    c='Opinion id'+self.id+'\n'
+    c+='  Holders: '+'-'.join(self.holders)+'\n'
+    c+='  Targets: '+'-'.join(self.targets)+'\n'
+    c+=str(self.opi_exp)
+    return c
+    
+    
+
+class KafSingleProperty:
+  def __init__(self,id,type,targets):
+    self.id = id
+    self.type = type
+    self.targets = targets
+  
+  def __str__(self):
+    return 'Id: '+self.id+' Type: '+self.type+' ids:'+' '.join(self.targets)
+
+
+class KafSingleEntity:
+  def __init__(self,id,type,targets):
+    self.id = id
+    self.type = type
+    self.targets = targets
+  
+  def __str__(self):
+    return 'Id: '+self.id+' Type: '+self.type+' ids:'+' '.join(self.targets)
 
 class KafTerm:
   def __init__(self):
