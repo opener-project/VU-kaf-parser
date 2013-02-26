@@ -29,7 +29,7 @@ class KafParser:
         return lang
     
   def getTerms(self):
-     if self.tree:
+     if self.tree and self.tree.find('terms'):
        for element in self.tree.find('terms'):
            kafTermObj = KafTerm()
            kafTermObj.setId(element.get('tid'))
