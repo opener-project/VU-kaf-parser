@@ -107,10 +107,17 @@ class KafParser:
       
   
   def addLinguisticProcessor(self,name,version, layer, time_stamp=True):
+    aux = self.tree.findall('kafHeader')
+    if len(aux)!=0:
+      kaf_header = aux[0]
+    else:
+      kaf_header = etree.Element('kafHeader')
+      self.tree.getroot().insert(0,kaf_header)
+
     ## Check if there is already element for the layer
     my_lp_ele = None
     
-    for element in self.tree.findall('linguisticProcessors'):
+    for element in kaf_header.findall('linguisticProcessors'):
       if element.get('layer','')==layer:
         my_lp_ele = element
         break
@@ -129,14 +136,13 @@ class KafParser:
       my_lp_ele.append(my_lp)
     else:
       # Create a new element for the LP layer
-      idx = self.tree.getroot().index(element)
       my_lp_ele = etree.Element('linguisticProcessor')
       my_lp_ele.set('layer',layer)
       my_lp_ele.append(my_lp)
       #my_lp_ele.tail=my_lp_ele.text='\n'
       ## Should be inserted after the last linguisticProcessor element (stored in variable element)
-      idx = self.tree.getroot().index(element)
-      self.tree.getroot().insert(idx+1,my_lp_ele)
+      idx = kaf_header.getroot().index(element)
+      kaf_header.insert(idx+1,my_lp_ele)
         
       
   def addLayer(self,type,element):
