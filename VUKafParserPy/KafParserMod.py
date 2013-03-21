@@ -141,7 +141,7 @@ class KafParser:
       my_lp_ele.append(my_lp)
       #my_lp_ele.tail=my_lp_ele.text='\n'
       ## Should be inserted after the last linguisticProcessor element (stored in variable element)
-      idx = kaf_header.getroot().index(element)
+      idx = kaf_header.index(element)
       kaf_header.insert(idx+1,my_lp_ele)
         
       
