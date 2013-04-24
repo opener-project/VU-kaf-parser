@@ -52,7 +52,7 @@ class KafParser:
            sentiment = element.find('sentiment')
            if sentiment is not None:
              resource = sentiment.get('resource','')
-             polarity = sentiment.get('polarity','')
+             polarity = sentiment.get('polarity',None)
              strength = sentiment.get('strength','')
              subjectivity = sentiment.get('subjectivity','')
              sentiment_modifier = sentiment.get('sentiment_modifier')
@@ -190,6 +190,9 @@ class KafParser:
       for element in self.tree.findall('properties/property'):
           my_id = element.get('pid')
           my_type = element.get('type')
+          ref = element.find('references')
+          if ref is not None:
+            element = ref
           for span_element in element.findall('span'):
               target_ids = [target_element.get('id') for target_element in span_element.findall('target')]
               my_prop = KafSingleProperty(my_id,my_type,target_ids)
@@ -201,6 +204,9 @@ class KafParser:
       for element in self.tree.findall('entities/entity'):
           my_id = element.get('eid')
           my_type = element.get('type')
+          ref = element.find('references')
+          if ref is not None:
+            element = ref
           for span_element in element.findall('span'):
               target_ids = [target_element.get('id') for target_element in span_element.findall('target')]
               my_prop = KafSingleEntity(my_id,my_type,target_ids)

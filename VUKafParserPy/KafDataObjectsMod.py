@@ -57,6 +57,16 @@ class KafSingleProperty:
     self.id = id
     self.type = type
     self.targets = targets
+    
+    
+  def get_id(self):
+    return self.id
+    
+  def get_type(self):
+    return self.type
+  
+  def get_span(self):
+    return self.targets
   
   def __str__(self):
     return 'Id: '+self.id+' Type: '+self.type+' ids:'+' '.join(self.targets)
@@ -67,6 +77,15 @@ class KafSingleEntity:
     self.id = id
     self.type = type
     self.targets = targets
+    
+  def get_id(self):
+    return self.id
+    
+  def get_type(self):
+    return self.type
+  
+  def get_span(self):
+    return self.targets
   
   def __str__(self):
     return 'Id: '+self.id+' Type: '+self.type+' ids:'+' '.join(self.targets)
@@ -84,6 +103,18 @@ class KafTerm:
     
   def get_list_span(self):
     return self.list_span_id
+    
+  def get_polarity(self):
+    if self.sentiment != None:
+      return self.sentiment.getPolarity()
+    else:
+      return None
+      
+  def get_sentiment_modifier(self):
+    if self.sentiment != None:
+      return self.sentiment.getSentimentModifier()
+    else:
+      return None
     
     
   def setSentiment(self,my_sent):
