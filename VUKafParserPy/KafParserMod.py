@@ -2,7 +2,12 @@
 # 14 Jan 2013: added function add_attrs_to_layer
 ########################################################################
 
-__version__ = '1.0 27-Feb-2013'
+###################
+# List of changes #
+###################
+# 14 Jan 2013: added function add_attrs_to_layer
+# 27 Feb 2013: added code for comply with DTD
+# 18 Jun 2013: getSingleProperties adapted to the structure KAF/features/properties/property/references/span/target
 
 from lxml import etree
 from KafDataObjectsMod import *
@@ -17,6 +22,11 @@ class KafParser:
         self.tree = etree.parse(filename,etree.XMLParser(remove_blank_text=True))
         ## Do the text tokenization
         self.__textTokenization()
+    else:
+        root = etree.Element('KAF')
+        root.set('version','v1.opener')
+        root.set('{http://www.w3.org/XML/1998/namespace}lang','en')
+        self.tree = etree.ElementTree(element=root)
         
   def __textTokenization(self):
     for wf in self.tree.findall('text/wf'):
@@ -145,7 +155,10 @@ class KafParser:
       kaf_header.insert(idx+1,my_lp_ele)
         
       
-  def addLayer(self,type,element):
+  def addLayer(self,type,element,first_char_id=None):
+    if first_char_id is None:
+        first_char_id = type[0]
+        
     ## Check if there is already layer for the type
     layer_element = self.tree.find(type)
     
@@ -153,20 +166,21 @@ class KafParser:
       layer_element = etree.Element(type)
       self.tree.getroot().append(layer_element)
       ## The id is going to be the first one
-      new_id = type[0]+'_1'
+      new_id = first_char_id+'1'
     else:
       ## We need to know how many elements there are in the layer
       current_n = len(layer_element.getchildren())
-      new_id = type[0]+'_'+str(current_n+1)
+      new_id = first_char_id+''+str(current_n+1)
       
       
     ## In this point layer_element points to the correct element, wether existing or created
     
-    element.set(type[0]+'id',new_id)
+    element.set(first_char_id+'id',new_id)
     layer_element.append(element)
+    return new_id
     
-  def addElementToLayer(self,layer, element):
-    self.addLayer(layer,element)
+  def addElementToLayer(self,layer, element,first_char_id=None):
+    return self.addLayer(layer,element,first_char_id)
 
   def add_attrs_to_layer(self,layer,attrs):
     layer_element = self.tree.find(layer)
@@ -185,8 +199,9 @@ class KafParser:
           return
 
   
-  
-  def getSingleProperties(self):
+  ## This works with the original definition of the property layer
+  ## KAF -> properties -> property* -> span* -> target*
+  def getSingleProperties_old(self):
       for element in self.tree.findall('properties/property'):
           my_id = element.get('pid')
           my_type = element.get('type')
@@ -197,8 +212,19 @@ class KafParser:
               target_ids = [target_element.get('id') for target_element in span_element.findall('target')]
               my_prop = KafSingleProperty(my_id,my_type,target_ids)
               yield my_prop
-
-
+               
+  ## 18-June-2013
+  def getSingleProperties(self):
+      for property in self.tree.findall('features/properties/property'):
+          my_id = property.get('pid')
+          if my_id is None:
+              my_id = property.get('fpid')
+          my_type = property.get('lemma')
+          for span_element in property.findall('references/span'):
+              target_ids = [target_element.get('id') for target_element in span_element.findall('target')]
+              my_prop = KafSingleProperty(my_id,my_type,target_ids)
+              yield my_prop
+  
   
   def getSingleEntities(self):
       for element in self.tree.findall('entities/entity'):
