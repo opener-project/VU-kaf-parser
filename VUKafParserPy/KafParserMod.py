@@ -257,7 +257,7 @@ class KafParser:
           
       if property_layer is None:  # There is no any property for that type, let's create one
           property_layer = etree.Element('property')
-          property_layer.set('fpid','fp'+str(num_props+1))
+          property_layer.set('pid','p'+str(num_props+1))
           property_layer.set('lemma',my_type)    
           properties_layer.append(property_layer)
           
