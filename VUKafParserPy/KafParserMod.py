@@ -250,7 +250,6 @@ class KafParser:
       for property in properties_layer.findall('property'):
           num_props += 1
           prop_type = property.get('lemma')
-          print prop_type, my_type
           if prop_type == my_type:
               property_layer = property
               break
