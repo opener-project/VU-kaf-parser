@@ -278,10 +278,14 @@ class KafParser:
 	  for element in self.tree.findall('entities/entity'):
 		  my_id = element.get('eid')
 		  my_type = element.get('type')
+		  my_path_to_span = None
 		  ref = element.find('references')
 		  if ref is not None:
-			element = ref
-		  for span_element in element.findall('span'):
+                      my_path_to_span = 'references/span'
+                  else:
+                      my_path_to_span = 'span'
+
+		  for span_element in element.findall(my_path_to_span):
 			  target_ids = [target_element.get('id') for target_element in span_element.findall('target')]
 			  my_prop = KafSingleEntity(my_id,my_type,target_ids)
 			  yield my_prop
