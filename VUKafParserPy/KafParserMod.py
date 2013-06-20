@@ -52,7 +52,7 @@ class KafParser:
 	
   def getTerms(self):
 	 if self.tree:
-	   for element in self.tree.find('terms'):
+	   for element in self.tree.findall('terms/term'):
 		   kafTermObj = KafTerm()
 		   kafTermObj.setId(element.get('tid'))
 		   kafTermObj.setLemma(element.get('lemma'))
