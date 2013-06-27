@@ -9,6 +9,8 @@
 # 27 Feb 2013: added code for comply with DTD
 # 18 Jun 2013: getSingleProperties adapted to the structure KAF/features/properties/property/references/span/target
 # 18 Jun 2013: funcion add_property created for adding the properties to the KAF
+
+
 from lxml import etree
 from KafDataObjectsMod import *
 import time
@@ -43,6 +45,28 @@ class KafParser:
 	  lang = self.tree.getroot().get('{http://www.w3.org/XML/1998/namespace}lang','nl')
 	  return lang
 	  
+  ## Return a list of (sentence_id, TOKENS) where tokens is a list of (token_id,token)
+  ## [(s_id1, T1), (sent_id2, T2)....]
+  ## T1 --> [(tokenid, token), (tokenid2,token2)....]
+  def get_tokens_in_sentences(self):
+      sents = []
+      current = []
+      previous_sent = None
+      for element in self.tree.findall('text/wf'):
+          w_id = element.get('wid')
+          s_id = element.get('sent')
+          word = element.text
+          
+          if previous_sent is not None and s_id != previous_sent:
+              sents.append((previous_sent,current))
+              current = []
+          current.append((w_id,word))
+          previous_sent = s_id
+      ####
+      sents.append((s_id,current)) 
+      return sents
+          
+      
   def getTokens(self):
 	for element in self.tree.findall('text/wf'):
 	  w_id = element.get('wid')
