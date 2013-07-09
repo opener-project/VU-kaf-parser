@@ -19,7 +19,8 @@ class KafParser:
   def __init__(self,filename=None):
 	self.tree=None
 	self.__pathForToken={}
-	
+	self.__term_ids_for_token_id = None
+    
 	if filename:
 		self.tree = etree.parse(filename,etree.XMLParser(remove_blank_text=True))
 		## Do the text tokenization
@@ -65,6 +66,20 @@ class KafParser:
       ####
       sents.append((s_id,current)) 
       return sents
+  
+  def get_term_ids_for_token_id(self,tok_id):
+      if self.__term_ids_for_token_id is None:
+          self.__term_ids_for_token_id = {}
+          for element in self.tree.findall('terms/term'):
+              term_id = element.get('tid')
+              for target in element.findall('span/target'):
+                  token_id = target.get('id')
+                  if token_id not in self.__term_ids_for_token_id:
+                      self.__term_ids_for_token_id[token_id] = [term_id]
+                  else:
+                      self.__term_ids_for_token_id[token_id].append(term_id)
+      return self.__term_ids_for_token_id[tok_id]
+  
           
       
   def getTokens(self):
@@ -350,7 +365,67 @@ class KafParser:
 		  strength = opi_exp_ele.get('strength','')
 		  tar_ids_exp = [t_ele.get('id') for t_ele in opi_exp_ele.findall('span/target')]
 
-	  yield KafOpinion(my_id,tar_ids_hol, tar_ids_tar, KafOpinionExpression(polarity, strength,tar_ids_exp))	
+	  yield KafOpinion(my_id,tar_ids_hol, tar_ids_tar, KafOpinionExpression(polarity, strength,tar_ids_exp))
+
+
+  
+  def remove_opinion_layer(self):
+      opinion_layer = self.tree.find('opinions')
+      if opinion_layer is not None:
+          self.tree.getroot().remove(opinion_layer)
+  
+  ## This function add an opinion to the opinion layer, creating it if does not exist
+  ## The id is calculated automatically according to the number of elements and ensring there is no repetition
+  def add_opinion(self,hol_ids,tar_ids,polarity,strength,exp_ids):
+      
+      #Looking for opinion layer or creating it
+      opinion_layer = self.tree.find('opinions')
+      if opinion_layer is None:
+          opinion_layer = etree.Element('opinions')
+          self.tree.getroot().append(opinion_layer)
+          
+      ## Generating unique id
+      list_of_oids = [opi.get('oid') for opi in opinion_layer]
+      
+      n = 1
+      while True:
+          my_id = 'o'+str(n)
+          if my_id not in list_of_oids:
+              break
+          n += 1
+      #####
+          
+      op_ele = etree.Element('opinion')
+      opinion_layer.append(op_ele)
+      op_ele.set('oid',my_id)
+
+      ## Holder
+      op_hol = etree.Element('opinion_holder')
+      op_ele.append(op_hol)
+      span_op_hol = etree.Element('span')
+      op_hol.append(span_op_hol)
+      for my_id in hol_ids:
+        span_op_hol.append(etree.Element('target',attrib={'id':my_id}))
+
+      ## TARGET
+      op_tar = etree.Element('opinion_target')
+      op_ele.append(op_tar)
+      span_op_tar = etree.Element('span')
+      op_tar.append(span_op_tar)
+      for my_id in tar_ids:
+        span_op_tar.append(etree.Element('target',attrib={'id':my_id}))
+
+      ## Expression
+    
+      op_exp = etree.Element('opinion_expression',attrib={'polarity':polarity,
+                                                       'strength':str(strength)})
+      op_ele.append(op_exp)
+      span_exp = etree.Element('span')
+      op_exp.append(span_exp)
+      for my_id in exp_ids:
+        span_exp.append(etree.Element('target',attrib={'id':my_id}))
+
+
 
 	
 	
