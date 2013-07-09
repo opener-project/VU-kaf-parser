@@ -2,6 +2,10 @@
 *~
 COPYED_TO
 
+#Stuff from eclipse
+.project
+.pydevproject
+
 # Packages
 *.egg
 *.egg-info

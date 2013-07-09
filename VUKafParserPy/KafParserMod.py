@@ -148,6 +148,12 @@ class KafParser:
 	  kaf_header = etree.Element('kafHeader')
 	  self.tree.getroot().insert(0,kaf_header)
 
+        aux2= kaf_header.findall('linguisticProcessors')
+        if len(aux2) == 0:
+          new_lp = etree.Element('linguisticProcessors')
+          new_lp.set('layer',layer)
+          kaf_header.append(new_lp)
+          
 	## Check if there is already element for the layer
 	my_lp_ele = None
 	
