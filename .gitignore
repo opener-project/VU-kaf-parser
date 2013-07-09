@@ -5,6 +5,7 @@ COPYED_TO
 #Stuff from eclipse
 .project
 .pydevproject
+.#KafParserMod.py
 
 # Packages
 *.egg
