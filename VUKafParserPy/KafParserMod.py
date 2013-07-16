@@ -96,7 +96,8 @@ class KafParser:
 		   kafTermObj.setId(element.get('tid'))
 		   kafTermObj.setLemma(element.get('lemma'))
 		   kafTermObj.setPos(element.get('pos'))
-		   
+		   kafTermObj.morphofeat = element.get('morphofeat')
+		   		   
 		   ## Parsing sentiment
 		   sentiment = element.find('sentiment')
 		   if sentiment is not None:

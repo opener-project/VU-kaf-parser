@@ -95,8 +95,12 @@ class KafTerm:
     self.tid = None
     self.lemma = None
     self.pos = None
+    self.morphofeat = None
     self.sentiment = None
     self.list_span_id = []
+    
+  def get_morphofeat(self):
+    return self.morphofeat
     
   def set_list_span_id(self, L):
     self.list_span_id = L
