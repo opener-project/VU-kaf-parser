@@ -78,7 +78,7 @@ class KafParser:
                       self.__term_ids_for_token_id[token_id] = [term_id]
                   else:
                       self.__term_ids_for_token_id[token_id].append(term_id)
-      return self.__term_ids_for_token_id[tok_id]
+      return self.__term_ids_for_token_id.get(tok_id,[])
   
           
       
@@ -279,7 +279,7 @@ class KafParser:
   # Agglomerates all the properties for the same TYPE under the same property element
   # It calculates automatically the number for the identifier depending on the number
   # of properties existing
-  def add_property(self,my_type,list_ids):
+  def add_property(self,my_type,list_ids,comment=None):
       
       #Looking for feature layer or creating it
       feature_layer = self.tree.find('features')
@@ -314,6 +314,8 @@ class KafParser:
           references = etree.Element('references')
           property_layer.append(references)
       ## Create the new span
+      if comment is not None:
+        references.append(etree.Comment(comment))
       span = etree.Element('span')
       references.append(span)
       for my_id in list_ids:
