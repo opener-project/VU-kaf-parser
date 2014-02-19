@@ -89,6 +89,8 @@ class KafParser:
 	  word = element.text
 	  yield (word, s_id, w_id)
 	
+    
+    
   def getTerms(self):
 	 if self.tree:
 	   for element in self.tree.findall('terms/term'):
