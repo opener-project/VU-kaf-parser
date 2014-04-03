@@ -194,7 +194,7 @@ class KafParser:
 	  my_lp_ele.append(my_lp)
 	else:
 	  # Create a new element for the LP layer
-	  my_lp_ele = etree.Element('linguisticProcessor')
+	  my_lp_ele = etree.Element('linguisticProcessors')
 	  my_lp_ele.set('layer',layer)
 	  my_lp_ele.append(my_lp)
 	  #my_lp_ele.tail=my_lp_ele.text='\n'
