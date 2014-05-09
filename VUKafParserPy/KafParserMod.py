@@ -38,8 +38,10 @@ class KafParser:
 	 
   
   def getToken(self,tid):
-	path = self.__pathForToken[tid]
-	return self.tree.xpath(self.__pathForToken[tid])[0]
+      if tid in self.__pathForToken:
+          path = self.__pathForToken[tid]
+          return self.tree.xpath(self.__pathForToken[tid])[0]
+      return None
 
   
   def getLanguage(self):
