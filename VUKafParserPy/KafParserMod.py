@@ -22,7 +22,8 @@ class KafParser:
 	self.__term_ids_for_token_id = None
     
 	if filename:
-		self.tree = etree.parse(filename,etree.XMLParser(remove_blank_text=True))
+		#self.tree = etree.parse(filename,etree.XMLParser(remove_blank_text=True))
+		self.tree = etree.parse(filename,etree.XMLParser(remove_blank_text=True, strip_cdata=False))
 		## Do the text tokenization
 		self.__textTokenization()
 	else:
